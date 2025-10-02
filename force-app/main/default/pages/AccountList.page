@@ -1,0 +1,171 @@
+<apex:page docType="html-5.0" showHeader="true" cache="false">
+<style type="text/css">
+.table3 {
+  border-collapse: collapse;
+}
+.table3 th {
+  background-color: #cccccc;
+}
+</style>  
+  <table id="ACTBL" border="1" cellspacing="1" cellpadding="1" align="left" class="table3" >
+      <tr>
+        <th>No</th>
+        <th width="90">SSO</th>
+        <th>都道府県</th>
+        <th>施設名</th>                
+        <th>病床数</th>        
+        <th>CC担当者</th>             
+        <th>直近１年の訪問数</th>
+        <th>ソフトウェア採用情報</th>
+        <th>SMBG採用機種</th>                        
+        <th>当社SMBG</th>
+        <th>A1c</th>
+        <th>血糖</th>
+        <th>尿</th>                        
+        <th>生化学</th>
+        <th>血算</th>
+        <th>その他</th>        
+        <th>備考</th>
+        <th>MEQID</th>
+                                                     
+      </tr>
+  </table>
+  <apex:includeScript value="{!URLFOR($Resource.JSforce)}" />
+  <apex:includeScript value="{!URLFOR($Resource.jQuery)}" />
+  <script>
+    var conn = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });      
+
+
+
+
+    var SQL = 'SELECT Id,AccountAddInfo__c, Name,SSO2__c,ShippingState,TDFKNumber__c,CCUSER__r.Name,YBeds__c ';
+    SQL += 'FROM Account ';
+    SQL += 'WHERE ';
+    SQL += 'Classification__c = \'病院\' AND ';
+    SQL += 'Item160__c = true ';    
+    SQL += 'ORDER BY SSO2__c,TDFKNumber__c,ShippingState,YBeds__c DESC '
+    SQL += 'Limit 100 ';        
+    conn.query(SQL, function(err, res) {
+      if (err) { return console.error(err); }
+      console.log(res);
+      var i = 0;
+      res.records.forEach(function(e){
+        i++;
+        console.log(i);        
+        //console.log(e.SSO2__c + e.ShippingState + e.Name);
+        var tr = $('#ACTBL').append('<tr id="' + e.Id + '">' +
+            '<td>' + i + '</td>' +        
+            '<td>' + e.SSO2__c + '</td>' +
+            '<td>' + e.ShippingState + '</td>' +
+            '<td><a href=https://ap.salesforce.com/' + e.Id + '>' + e.Name + '</a></td>' +           
+            '<td>' + e.YBeds__c + '</td>' +     
+            '<td>' + (e.CCUSER__r ? e.CCUSER__r.Name : '') + '</td>' + 
+            '<td id="' + e.Id + '_TaskCnt">' +        // 
+            '<td id="' + e.Id + '_Software">' +        // ソフトフェア採用
+            '<td id="' + e.Id + '_SMBG">' +        // SMBG採用機種
+            '<td id="' + e.Id + '_SMBGARKRAY">' +        // 当社SMBG            
+            '<td id="' + e.Id + '_A1c">' + "" + '</td>' +        // A1c
+            '<td id="' + e.Id + '_Glu">' +        // 血糖
+            '<td id="' + e.Id + '_Aution">' +        // 尿
+            '<td id="' + e.Id + '_Seika">' +        // 生化学                        
+            '<td id="' + e.Id + '_Kessan">' +        // 血算
+            '<td id="' + e.Id + '_Other">' +        // その他
+            '<td id="' + e.Id + '_Biko">' +    // 備考                   
+            '<td>' + "" + '</td>' +        
+ 
+                                                            
+            '</tr>');
+            if(e.JDDM2015_Base__c == '○'){
+                //$("div").css("background-color","red");
+
+                $('#' + e.Id).css("background-color","skyblue");
+            }            
+            
+            /*
+              納入商品
+            */
+            var SQLAsset = 'SELECT Account__c, Id, Name,CategoryName1__c,CategoryName2__c,ProductName__c,ELAPSEDYEARS__c FROM Asset__c WHERE Account__c = \'' + e.Id + '\' and IsOperationEnd__c = false' ;
+            conn.query(SQLAsset , function(err2, res2) {
+              if (err2) { return console.error(err2); }          
+              res2.records.forEach(function(e2){
+                var idname = '';
+                switch(e2.CategoryName2__c){
+                  case '検査システム':
+                    idname = '#' + e2.Account__c + '_Software';
+                    break;
+                  case 'A1c':
+                    idname = '#' + e2.Account__c + '_A1c';
+                    break;
+                  case '血糖':
+                    idname = '#' + e2.Account__c + '_Glu';
+                    break;
+                  case '尿定性':
+                    idname = '#' + e2.Account__c + '_Aution';
+                    break;
+                  case '生化学':
+                    idname = '#' + e2.Account__c + '_Seika';
+                    break;
+                  case '血算':
+                    idname = '#' + e2.Account__c + '_Kessan';
+                    break;       
+                  default:
+                    idname = '#' + e2.Account__c + '_Other';
+                    break; 
+                }
+                if(e2.ELAPSEDYEARS__c){
+                  if(eval(e2.ELAPSEDYEARS__c) >= 5){
+                    $(idname).html('<div style="background-color:red;">' + e2.ProductName__c + ' ' + e2.ELAPSEDYEARS__c + '</div>');                                  
+                  }else if(eval(e2.ELAPSEDYEARS__c) >= 4){
+                    $(idname).html('<div style="background-color:yellow;">' + e2.ProductName__c + ' ' + e2.ELAPSEDYEARS__c + '</div>');                                  
+                  }else{
+                    $(idname).html('<div>' + e2.ProductName__c + ' ' + e2.ELAPSEDYEARS__c + '</div>');                                  
+                  }
+                }else{
+                  $(idname).text(e2.ProductName__c);                                
+                }
+
+
+              });
+            });
+            
+            console.log('a')
+            /*
+              商談
+            */            
+            var SQLOL = 'SELECT ProductPhase__c,CloseDate__c FROM OpportunityLineItem__c WHERE Opportunity__r.Account__r.Id = \'' + e.Id + '\' and StageName__c not in (\'失注\',\'商談に至らず\',\'標金額\')';
+            console.log(SQLOL);
+            conn.query(SQLOL , function(err3, res3) {
+              if (err3) { return console.error(err3); }          
+              var olname = '';
+              res3.records.forEach(function(e3){
+                olname += e3.ProductPhase__c + e3.CloseDate__c + '<br />';
+                });
+              $('#' + e.Id + '_Biko').html('<div>' + olname  + '</div>');   
+            });
+            
+            
+            
+            
+            /*
+              直近１年間の活動数
+            */
+            var SQLTodo = 'SELECT Id FROM Task WHERE WhatId = \'' + e.Id + '\' and ActivityDate = LAST_N_Months:12 ';
+            conn.query(SQLTodo , function(err3, res3) {
+              if (err3) { return console.error(err3); }       
+                 
+              var celname = '#' + e.Id + '_TaskCnt';
+              $(celname).text(res3.records.length);  
+              console.log(res3.records.length);                              
+            });
+
+            
+        console.log(i);    
+
+      });
+
+    });
+
+    
+    
+  </script>
+</apex:page>

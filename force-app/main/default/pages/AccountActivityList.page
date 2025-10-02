@@ -1,0 +1,158 @@
+<apex:page docType="html-5.0" showHeader="true" title="市場情報" cache="false" applyHtmlTag="true" applyBodyTag="false">
+
+<html ng-app='app1'>
+  <head>
+    <style type="text/css">
+      .table3 {
+        border-collapse: collapse;
+      }
+      .table3 th {
+        background-color: #cccccc;
+      }
+    </style>
+    <apex:includeScript value="{!URLFOR($Resource.JSforce)}" />
+    <apex:includeScript value="{!URLFOR($Resource.jQuery)}" />  
+    <apex:includeScript value="{!URLFOR($Resource.angularjs)}" />
+
+
+    <script type="text/javascript">
+
+        window.onload = function () {
+            console.log('window.onload');
+            var bodyscope = angular.element(bodyScope).scope();
+
+            if (location.hostname == 'localhost') {
+            }else{
+                var conn = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });
+                bodyscope.$apply(function () {
+                    bodyscope.SetConnection(conn);
+                    bodyscope.ShowResult();
+                });
+            }
+
+            bodyscope.$apply(function () {
+                
+        });
+      }
+    </script>  
+
+
+    <!-- ------------通常切り取り開始場所-------------------------- -->
+    <style type="text/css">
+        .table3 {
+            border-collapse: collapse;
+        }
+
+        .table3 th {
+            background-color: #cccccc;
+        }
+
+        .Asset4YearsAgo {
+            background-color: Yellow;
+        }
+
+        .Asset5YearsAgo {
+            background-color: Red;
+        }
+
+        .EvenRow{
+            background-color: #eeeeee;
+        }
+
+
+    </style>
+</head>
+<body id="bodyScope" ng-controller="ctrl1">
+
+    <div style="{{SearchConditionDisplay}}">
+        <button onclick="javascript:jsforce.browser.login();" ng-show="IsShowLoginButton">Login</button>
+        <Button ng-click="ShowResult()" ng-show="IsShowGetDataButton">データ取得</Button>
+        <div>{{message}}</div>
+        <div>{{message2}}</div>
+    </div>
+
+    <table>
+        <tr ng-repeat="ac in ActivityHistories" >
+            <td>{{ac.Subject}}</td>
+            <td>{{ac.ActivityDate}}</td>
+            <td>{{ac.Dialy__c}}</td>
+        </tr>
+    </table>
+
+    <script>
+var Activity = (function () {
+    function Activity() {
+    }
+    return Activity;
+})();
+var SfApp;
+(function (SfApp) {
+    var app1 = angular.module('app1', []);
+    var ctrl1 = app1.controller('ctrl1', function ($scope) {
+        $scope.conn = {};
+        $scope.ActivityHistories = new Array();
+        $scope.IsShowLoginButton = false;
+        $scope.IsShowGetDataButton = false;
+        $scope.SetConnection = function (conn) {
+            console.log('-SetConnection');
+            $scope.conn = conn;
+            if (location.hostname == 'localhost') {
+                $scope.IsShowLoginButton = true;
+                $scope.IsShowGetDataButton = true;
+            }
+        };
+        $scope.ShowResult = function () {
+            $scope.message = 'データを取得しています。データ件数が多い場合、数分かかる場合があります。しばらくお待ちください・・・';
+            console.log('-ShowResult');
+            var AccountId = '';
+            var urlparam = location.search;
+            console.log('urlparam=' + urlparam);
+            if (urlparam.length > 0) {
+                if (location.hostname == 'localhost') {
+                    var param1 = urlparam.substr(4, 15);
+                    AccountId = param1;
+                }
+                else {
+                    var param1 = urlparam.substr(4, 15);
+                    AccountId = param1;
+                }
+            }
+            console.log('AccountId=' + AccountId);
+            var SQL = 'SELECT Id ,';
+            SQL = SQL + '(SELECT Id, Subject,ActivityDate,Dialy__c From OpenActivities ),';
+            SQL = SQL + '(SELECT Id, Subject,ActivityDate,Dialy__c FROM ActivityHistories) ';
+            SQL = SQL + 'FROM Account ';
+            SQL = SQL + 'WHERE Id=\'' + AccountId + '\'';
+            console.log(SQL);
+            $scope.rows = [];
+            var rowindex = 0;
+            $scope.conn.query(SQL)
+                .on("record", function (record) {
+                rowindex++;
+                record.ActivityHistories.records.forEach(function (e) {
+                    console.log(e);
+                    var activity = new Activity();
+                    activity = e;
+                    $scope.ActivityHistories.push(activity);
+                });
+            })
+                .on("end", function (query) {
+                $scope.message = '';
+                console.log('end');
+                $scope.$apply();
+            })
+                .on("error", function (err) {
+                console.error(err);
+            })
+                .run({ autoFetch: true, maxFetch: 4000 });
+        };
+    });
+})(SfApp || (SfApp = {}));
+//# sourceMappingURL=app.js.map
+    </script>   
+
+
+  <iframe src="/apex/ALAssetList" name="sidebarViewPage" frameborder="0" height="0" allowtransparency="true"></iframe>
+  </body>
+</html>
+</apex:page>

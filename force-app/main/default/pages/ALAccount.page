@@ -1,0 +1,3 @@
+<apex:page standardController="Account" extensions="ALCommon" action="{!writeAccount}" showheader="false" >
+
+</apex:page>

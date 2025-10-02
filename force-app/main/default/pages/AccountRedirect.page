@@ -1,0 +1,13 @@
+<apex:page Controller="AccountRedirectController" action="{!Go}" >
+<apex:param name="AccountId" value="{Id}" />
+  <apex:form >
+  
+      <apex:commandbutton action="{!Go}" value="実行">
+          <apex:param name="AccountId" value="{Id}" />
+      </apex:commandButton>
+      <apex:outputLabel value="{!log}"/>
+      <apex:page action="{!Go}">
+          
+      </apex:page>
+  </apex:form>
+</apex:page>

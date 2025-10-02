@@ -1,0 +1,6 @@
+<apex:page tabStyle="Opportunity__c">
+  <apex:enhancedList type="Opportunity__c"
+             customizable="false" 
+             height="600" 
+             rowsPerPage="50" />
+</apex:page>

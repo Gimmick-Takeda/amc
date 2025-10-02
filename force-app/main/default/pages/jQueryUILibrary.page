@@ -1,0 +1,6 @@
+<apex:page >
+    <meta charset="utf-8" />
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryUILibrary, 'jquery-ui-1.9.2.custom/css/jquery-ui-1.9.2.custom.css')}" />
+    <apex:includescript value="{!URLFOR($Resource.jQueryUILibrary, 'jQueryUILibrary.zip')}" />
+    <apex:includescript value="{!URLFOR($Resource.jQueryUILibrary, 'jQueryUILibrary.zip/js/jquery-ui-1.9.2.custom.js')}" />    
+</apex:page>

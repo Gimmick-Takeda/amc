@@ -1,0 +1,3 @@
+<apex:page StandardController="DMQOL__c" extensions="ALCommon" action="{!writeDMQOL}" showHeader="false">
+
+</apex:page>

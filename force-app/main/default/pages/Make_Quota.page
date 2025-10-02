@@ -1,0 +1,167 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" standardController="Opportunity__c" extensions="QuotationCountupLEX,SetErrId,SetQuotationType"  action="{!countup}">
+
+    <apex:includeScript value="https://s.oproarts.com/js/jquery-1.12.4.min.js" />
+    <apex:includeScript value="https://s.oproarts.com/js/live_ff-1.32.js" />
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+        
+        // 見積種別判定 
+            var QNo;
+            var QType = '{! Opportunity__c.QuotationType__c }'
+                        
+            //alert(QType);
+            
+            switch (QType) {
+            
+            
+                case '01：個別価格タイプ（卸）':
+                    QNo = 1;
+                    break;
+                case '01b：個別価格タイプ（相見積）':
+                    QNo = 11;
+                    break;
+                case '02：個別価格タイプ（施設）':
+                    QNo = 2;
+                    break;
+                case '03：一括値引タイプ（卸）':
+                    QNo = 3;
+                    break;
+                case '03b：一括値引タイプ（相見積）':
+                    QNo = 31;
+                    break;
+                case '04：一括値引タイプ（施設）':
+                    QNo = 4;
+                    break;
+                case '05：一式見積タイプ（卸）':
+                    QNo = 5;
+                    break;
+                case '05b：一式見積タイプ（相見積）':
+                    QNo = 51;
+                    break;
+                case '06：一式見積タイプ（施設）':
+                    QNo = 6;
+                    break;
+                case '07：BGM専用見積(卸)':
+                    QNo = 7;
+                    break;
+                case '08：BGM専用見積（施設）':
+                    QNo = 8;
+                    break;
+                default: 
+                    QNo = 10;
+                    break; 
+            
+            }
+            
+            // alert(QNo);
+            
+            try {
+                if ((QNo == 1 || QNo == 3 || QNo == 5 || QNo == 7) && '{!Opportunity__c.Customer_Length__c}' == 0) { 
+                    throw new Error('終了します');
+                } else if ((QNo == 11 || QNo == 31 || QNo == 51) && '{!Opportunity__c.WholesaleMQNameCount__c}' == 0) { 
+                    throw new Error('終了します'); 
+                } else if ((QNo == 1 || QNo == 3 || QNo == 5 || QNo == 7) && {! Opportunity__c.PaymentTermsNameLength__c } == 0) {
+                    throw new Error('終了します'); 
+                } else if ((QNo == 11 || QNo == 31 || QNo == 51) && '{!Opportunity__c.MQPaymentNameLength__c}' == 0) { 
+                    throw new Error('終了します'); 
+                } else if ((QNo == 2 || QNo == 4 || QNo == 6 || QNo == 8) && '{!Opportunity__c.AccountPriceCheck__c}' > 0) { 
+                    throw new Error('終了します'); 
+                } else if ((QNo == 11 || QNo == 31 || QNo == 51) && '{!Opportunity__c.MQPriceNoInput__c}' > 0) { 
+                    throw new Error('終了します'); 
+                } else if ((QNo == 3 || QNo == 4 || QNo == 31) && '{!Opportunity__c.OpenPriceCount__c}' > 0) { 
+                    throw new Error('終了します'); 
+                } else if ((QNo == 5 || QNo == 6) && '{!Opportunity__c.SetProductNameLength__c}' == 0) { 
+                    throw new Error('終了します'); 
+                }
+                output();
+            } catch (e) {
+                console.log(e.message);
+            }
+        });
+        
+        function now() {
+            var d = new Date();
+            return pad(d.getFullYear(), 4)
+            + pad(d.getMonth() + 1, 2)
+            + pad(d.getDate(), 2);
+            function pad(v, len) {
+                v = "" + v;
+                while (v.length < len) v = "0" + v;
+                return v;
+            }
+        }
+
+
+        function submit(url) {
+            if (sforce && sforce.one) {
+                sforce.one.getVersion('22.0', function (s1) {
+                    s1.navigateToURL(url);
+                });
+            } else {
+                window.location.replace(url);
+            }
+        }
+
+        function output() {
+            var url = OPROARTS.Live.fF.action({
+
+                // tp: 配備済みテンプレートの名称を指定します。複数指定することもできます。
+                // このパラメータを省略することはできません。
+                tp:[
+                '{!qt1}','{!qt2}'
+                //'{!qt1}','{!qt2}','{!qt4}'
+                ],
+
+                // fe: フォントの埋め込むかどうかを指定します。true もしくは false で指定します。
+                // 実行するメソッドが 'toBuildUrl().pdf()' または 'toBuildUrl().pdfPreview()' の場合に有効です。
+                // また、テンプレートで埋め込み可能なフォントが使用されている必要があります。
+                fe:false,
+
+
+                // createsAttach: 作成されたドキュメントをオブジェクトに添付するかどうかを指定します。true もしくは false で指定します。
+                // 添付できないオブジェクトの場合、このパラメータを true で指定しないでください。
+                createsFileAttach:true,
+
+                // createsTask: 作成されたドキュメントを活動履歴に登録するかどうかを指定します。true もしくは false で指定します。
+                // 活動履歴に登録できないオブジェクトの場合、このパラメータを true で指定しないでください。
+                // このパラメータに true を指定した場合、次の追加パラメータを指定することができます。
+                // - taskSubject: 活動履歴の件名
+                // - taskComment: 活動履歴のコメント
+                // 無指定の場合は、システムの初期値が適用されます。
+                createsTask:false,
+
+                // title: ダウンロード・添付・活動履歴のファイル名を指定します。
+                title:now()+'{!qt3}'+'宛見積書'+'{!JSENCODE(  Opportunity__c.TaxIn_Label__c  )}',
+
+                // objectId: 帳票オブジェクトのIDを指定します。
+                objectId: '{!JSENCODE(Opportunity__c.Id)}',
+
+                // OPROARTS Live - Force.com API に必要な諸パラメータです。
+                // このパラメータを編集しないでください。
+                _type: 'live.forward',
+                api:['{!JSENCODE($Organization.Id)}','{!JSENCODE($User.Id)}','{!JSENCODE($Api.Session_ID)}','{!JSENCODE($Api.Partner_Server_URL_220)}']
+            }).url('https://www.oproarts.com/liveffb/action').toBuildUrl().pdf();
+            // 作成するドキュメントの形式のメソッドを呼び出します。
+            // Live for Salesforceのテンプレートの場合は以下が指定できます。
+                // - 'toBuildUrl().pdf()'   : pdfファイルを出力します。
+                // - 'toBuildUrl().opr()'   : oprファイルを出力します。 ※OPRO X Browser をクライアントPCにインストールしてください。
+                // - 'toBuildUrl().print()' : odpファイルを出力します。※OPRO X Browser をクライアントPCにインストールしてください。
+                // - 'toBuildUrl().pdfPreview()' : pdfファイル(プレビュー)を出力します。※この出力はカウントされません。
+                // - 'toBuildUrl().oprPreview()' : oprファイル(プレビュー)を出力します。※この出力はカウントされません。
+            // Live XLS for Salesforceのテンプレートの場合は以下が指定できます。
+                // - 'toBuildUrl().excelMerge()' : xlsx, xlsmファイルを出力します。
+
+            submit(url);
+        }
+    </script>
+    
+    <p class="buttons">
+            <h1>{!message2}</h1>
+    <p>{!message}</p>
+    <apex:outputPanel rendered="{!IF(message2 == 'しばらくお待ちください',true,false)}" >
+        <a onclick="output()" href="#">ダウンロード</a>
+    </apex:outputPanel>
+    </p>
+
+</apex:page>

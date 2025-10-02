@@ -1,0 +1,3 @@
+<apex:page StandardController="ScienceDaily__c" extensions="ALCommon" action="{!writeAssetList}" showHeader="false">
+
+</apex:page>

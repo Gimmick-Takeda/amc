@@ -1,0 +1,6 @@
+<apex:page >
+  <textbox></textbox>
+  <textbox></textbox>
+
+
+</apex:page>

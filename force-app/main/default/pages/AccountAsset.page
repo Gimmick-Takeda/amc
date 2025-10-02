@@ -1,0 +1,348 @@
+<apex:page standardController="Account" extensions="AccountControllerExtension" action="{!init}" showHeader="false">
+  <meta charset="utf-8" />  
+  <table cellspacing="0" cellpadding="6" border="1">
+      <tr>
+          <td>　</td>
+          <td colspan="2">
+              システム
+          </td>      
+          <td colspan="2">
+              ADAMS
+          </td>
+          <td colspan="3">
+              AUTION
+          </td>          
+          <td colspan="9">
+              POC
+          </td>  
+          <td colspan="1" rowspan="2">
+              遺伝子
+          </td>     
+          <td colspan="1" rowspan="2">
+              その他
+          </td>                                      
+      </tr>
+      <tr>
+          <td>　</td>
+          <td>
+              カルテ
+          </td>
+          <td>
+              検査
+          </td>       
+          <td>
+              A1c
+          </td>
+          <td>
+              血糖
+          </td>        
+          <td>
+              尿定性
+          </td>
+          <td>
+              沈査
+          </td>   
+          <td>
+              浸透圧
+          </td>     
+          <td>
+              CRP
+          </td>  
+          <td>
+              アンモニア
+          </td>         
+          <td>
+              インフル
+          </td>                                       
+          <td>
+              乳酸
+          </td>          
+          <td>
+              免疫
+          </td>          
+          <td>
+              生化学
+          </td>          
+          <td>
+              血ガス
+          </td>
+          <td>
+              血算
+          </td>          
+          <td>
+              電解質
+          </td>
+
+      </tr>      
+      <tr>
+          <td>稼働中</td>
+          <td>
+            <!-- カルテ -->
+            <apex:dataTable value="{!ExAssetsKarte}" var="asset" id="Karte" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】
+              </apex:column>
+            </apex:dataTable>
+          </td>
+          <td>
+            <!-- 検査システム -->
+            <apex:dataTable value="{!ExAssetsLabSystem}" var="asset" id="LabSystem" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】
+              </apex:column>
+            </apex:dataTable>
+          </td>       
+          <td>
+            <!-- A1c -->
+            <apex:dataTable value="{!ExAssetsA1c}" var="asset" id="A1c" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>
+          </td>
+          <td>
+            <!-- 血糖 -->
+            <apex:dataTable value="{!ExAssetsGLU}" var="asset" id="GLU" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>              
+          </td>        
+          <td>
+            <!-- 尿定性 -->
+            <apex:dataTable value="{!ExAssetsAution}" var="asset" id="Aution" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                   
+          </td>
+          <td>
+            <!-- 沈査 -->
+            <apex:dataTable value="{!ExAssetsTinsa}" var="asset" id="Tinsa" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>               
+          </td>   
+          <td>
+            <!-- 浸透圧 -->
+            <apex:dataTable value="{!ExAssetsOM}" var="asset" id="ExAssetsOM" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>     
+          <td>
+            <!-- CRP -->
+            <apex:dataTable value="{!ExAssetsCRP}" var="asset" id="ExAssetsCRP" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>  
+          <td>
+            <!-- アンモニア -->
+            <apex:dataTable value="{!ExAssetsAnmonia}" var="asset" id="ExAssetsAnmonia" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>         
+          <td>
+            <!-- インフルエンザ -->
+            <apex:dataTable value="{!ExAssetsInfuru}" var="asset" id="ExAssetsInfuru" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>                                       
+          <td>
+            <!-- 尿酸 -->
+            <apex:dataTable value="{!ExAssetsUA}" var="asset" id="ExAssetsUA" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>          
+          <td>
+            <!-- 免疫 -->
+            <apex:dataTable value="{!ExAssetsMeneki}" var="asset" id="ExAssetsMeneki" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>          
+          <td>
+            <!-- 生化学 -->
+            <apex:dataTable value="{!ExAssetsSeika}" var="asset" id="ExAssetsSeika" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>          
+          <td>
+            <!-- 血ガス -->
+            <apex:dataTable value="{!ExAssetsGas}" var="asset" id="ExAssetsGas" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>
+          <td>
+            <!-- 血算 -->
+            <apex:dataTable value="{!ExAssetsKessan}" var="asset" id="ExAssetsKessan" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>          
+          <td>
+            <!-- 電解質 -->
+            <apex:dataTable value="{!ExAssetsDenkaishitsu}" var="asset" id="ExAssetsDenkaishitsu" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>
+          <td>
+            <!-- 遺伝子 -->
+            <apex:dataTable value="{!ExAssetsIdenshi}" var="asset" id="ExAssetsIdenshi" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>          
+          <td>
+            <!-- その他 -->
+            <apex:dataTable value="{!ExAssetsOther}" var="asset" id="ExAssetsOther" rowClasses="odd,even" cellspacing="0" cellpadding="0" border="0">
+              <apex:column >
+                  <apex:facet name="header">
+                  </apex:facet>
+                  <apex:outputText value="{!asset.ProductName__c}"/>
+                  【<apex:outputText value="{!asset.ELAPSEDYEARS__c}"/>年】                  
+              </apex:column>
+            </apex:dataTable>                
+          </td>
+      </tr>    
+      <tr>
+        <td>稼働終了</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>        
+      </tr>
+      <tr>
+        <td>商談中</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>          
+      </tr>
+  </table>
+
+      
+
+  <apex:includeScript value="{!URLFOR($Resource.jQuery)}" />
+  <apex:stylesheet value="{!URLFOR($Resource.jQueryUILibrary, 'jquery-ui-1.11.2/jquery-ui.min.css')}" />
+  <apex:includescript value="{!URLFOR($Resource.jQueryUILibrary, 'jquery-ui-1.11.2/jquery-ui.min.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.JSforce)}" />
+  <script>
+    $(document).ready(function(){
+      $('#tabs').tabs();
+
+      var conn = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });
+
+      var id = '{!$CurrentPage.parameters.id}';
+      
+      $("#returnStandard").attr('href',"https://ap.salesforce.com/" + id)
+      
+      conn.query('SELECT Id, Name FROM Account WHERE Id=\'' + id + '\' LIMIT 5', function(err, res) {
+        if (err) { return console.error(err); }
+      
+        res.records.forEach(function(e,i,a){
+          $('#AccountName').text(e.Name);
+          console.log(e.Name);                
+        });    
+      });    
+    });
+  </script>
+</apex:page>

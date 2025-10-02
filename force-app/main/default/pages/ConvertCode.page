@@ -1,0 +1,42 @@
+<apex:page controller="ConvertCode" >
+
+  <!-- End Default Content REMOVE THIS -->
+  <apex:form >
+      <apex:pageBlock title="SAPコードSFIDへの変換" >
+          <apex:pageBlockButtons >
+              <apex:commandButton value="ＳＡＰコード＝＞ＳＦＩＤ　変換" action="{!ConvertCoreSystemCD2SFID}" />                  
+              <apex:commandButton value="都道府県,施設名＝＞ＳＦＩＤ　変換" action="{!ConvertStateAccountName2SFID}"/>
+              <apex:commandButton value="都道府県,施設名＝＞SAP得意先コード　変換" action="{!ConvertStateAccountName2SAPCODE}"/>
+              <apex:commandButton value="ユーザー名前＝＞ＵＳＥＲＩＤ　変換" action="{!ConvertUSERLastNameFirstName2USERID}"/>   
+          </apex:pageBlockButtons>
+              <apex:commandButton value="都道府県,施設名＝＞SAP得意先コード　変換 Step1(テキスト＝＞配列）" action="{!ConvertCoreSystemCD2Array}" />
+              <apex:commandButton value="都道府県,施設名＝＞SAP得意先コード　変換 Step2(100件ずつ取り出して変換）" action="{!Array2SFID}" />
+          <table>
+              <tr>
+                  <td>
+                      <apex:inputTextarea id="Input" value="{!InputText}" rows="20" cols="100"/>                  
+                  </td>
+                  <td>
+
+                  </td>
+                  <td width="500">
+                      <apex:inputTextarea id="Output" value="{!OutputText}" rows="20" cols="30"/>              
+                  </td>
+                  <td width="2000">
+                      <apex:inputTextarea id="log" value="{!log}" rows="20" cols="30"/>              
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      <apex:inputtext id="NumberOfExecute" value="{!NumberOfExecute}"/>
+                  </td>
+              </tr>
+          </table>
+
+
+      </apex:pageBlock>
+
+  </apex:form>
+
+  
+</apex:page>

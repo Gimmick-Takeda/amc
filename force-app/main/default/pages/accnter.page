@@ -1,0 +1,3 @@
+<apex:page Controller="ALDashboard" action="{!init}" showHeader="false">
+
+</apex:page>

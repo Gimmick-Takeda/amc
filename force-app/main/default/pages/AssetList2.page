@@ -1,0 +1,888 @@
+<apex:page docType="html-5.0" showHeader="false" title="市場情報" cache="false" applyHtmlTag="false" applyBodyTag="false">
+
+<html ng-app='app1'>
+  <head>
+    <style type="text/css">
+      .table3 {
+        border-collapse: collapse;
+      }
+      .table3 th {
+        background-color: #cccccc;
+      }
+    </style>
+    <apex:includeScript value="{!URLFOR($Resource.JSforce)}" />
+    <apex:includeScript value="{!URLFOR($Resource.jQuery)}" />  
+    <apex:includeScript value="{!URLFOR($Resource.angularjs)}" />
+
+
+    <script type="text/javascript">
+
+
+        window.onload = function () {
+            console.log('window.onload');
+            
+            var conn = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });              
+            
+            var bodyscope = angular.element(bodyScope).scope();
+            
+            bodyscope.$apply(function () {
+                bodyscope.SetConnection(conn);
+            });            
+            
+            bodyscope.$apply(function () {
+                bodyscope.GetSearchCondition();
+        });
+      }
+    </script>   
+    
+
+ 
+    <!-- ------------通常切り取り開始場所-------------------------- -->
+    <style type="text/css">
+        .table3 {
+            border-collapse: collapse;
+        }
+
+        .table3 th {
+            background-color: #cccccc;
+        }
+
+        .Asset4YearsAgo {
+            background-color: Yellow;
+        }
+
+        .Asset5YearsAgo {
+            background-color: Red;
+        }
+
+        .EvenRow{
+            background-color: #eeeeee;
+        }
+
+
+    </style>
+</head>
+<body id="bodyScope" ng-controller="ctrl1">
+
+    <!--<table>
+        <tr ng-repeat="col in AccountTable.ParentColumns">
+            <td>{{col.Path}}</td>
+            <td>{{col.IsShow}}</td>
+        </tr>
+    </table>
+
+    <pre>{{AccountTable.ParentColumns.length}}</pre>
+    <pre>{{SearchCondition}}</pre>
+    <pre>{{SearchConditionJSON}}</pre>-->
+
+    <!-- --------------------------------- 検索条件部分 --------------------------------- -->
+
+    <div style="{{SearchConditionDisplay}}">
+        <table border="1" cellspacing="0" cellpadding="1">
+            <tr>
+                <td><p>検索条件１</p></td>
+                <td><p>表示設定</p></td>
+                <td><p>表示列１</p></td>
+                <td><p>表示列２</p></td>
+                <td><p>表示列３</p></td>
+                <td><p>表示列４</p></td>
+                <td><p>説明</p></td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>SSO</td>
+                            <td>
+                                <select id="selectedState" ng-model="SearchCondition.SSO">
+                                    <option ng-repeat="sso in SSOArray" value="{{sso}}">{{sso}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                都道府県
+                            </td>
+                            <td>
+                                <select id="selectedState" ng-model="SearchCondition.state">
+                                    <option ng-repeat="state in StateArray" value="{{state}}">{{state}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                分類
+                            </td>
+                            <td>
+                                <select id="selectedClassification" ng-model="SearchCondition.classification">
+                                    <option value="病院">病院</option>
+                                    <option value="開業医">開業医</option>
+                                    <option value="動物">動物</option>
+                                    <option value="健診">健診</option>
+                                    <option value="検査センター">検査センター</option>
+                                    <option value="卸">卸</option>
+                                    <option value="薬局">薬局</option>
+                                    <option value="その他">その他</option>
+                                    <option value="すべて（卸・薬局以外）">すべて（卸・薬局以外）</option>
+                                    <option value="すべて">すべて</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>施設名</td>
+                            <td><input type="text" ng-model="SearchCondition.NameFilter" /></td>
+                        </tr>
+                        <tr>
+                            <td>CC担当者</td>
+                            <td><input type="text" ng-model="SearchCondition.CCUSERFilter" /></td>
+                        </tr>
+                        <tr>
+                            <td>検体検査管理加算</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.Kentai" /></td>
+                        </tr>
+                        <tr>
+                            <td>認定施設</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.Nintei" /></td>
+                        </tr>
+                        <tr>
+                            <td>医師会サーベイ参加</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.Ishikai" /></td>
+                        </tr>
+                        <tr>
+                            <td>技師会サーベイ参加</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.Gishikai" /></td>
+                        </tr>
+                        <tr>
+                            <td>JDDM参加</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.JDDM" /></td>
+                        </tr>
+                        <tr>
+                            <td>病床数</td>
+                            <td><input type="text" ng-model="SearchCondition.BedsFilter" />以上</td>
+                        </tr>
+                        <tr>
+                            <td>CC試薬ランク有</td>
+                            <td><input type="checkbox" ng-model="SearchCondition.CCReagentSaleRank__c" /></td>  
+                        </tr>
+
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>表の幅</td>
+                            <td><input type="text" ng-model="TableWidth" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr ng-repeat="item in AccountTable.ParentColumns|filter:{'SearchConditionCol':1}">
+                            <td><div>{{item.HeaderTitle}}</div></td>
+                            <td><input type="checkbox" ng-model="item.IsShow" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr ng-repeat="item in AccountTable.ParentColumns|filter:{'SearchConditionCol':2}">
+                            <td><div>{{item.HeaderTitle}}</div></td>
+                            <td><input type="checkbox" ng-model="item.IsShow" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr ng-repeat="item in AccountTable.ParentColumns|filter:{'SearchConditionCol':3}">
+                            <td><div>{{item.HeaderTitle}}</div></td>
+                            <td><input type="checkbox" ng-model="item.IsShow" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr ng-repeat="item in AccountTable.ParentColumns|filter:{'SearchConditionCol':4}">
+                            <td><div>{{item.HeaderTitle}}</div></td>
+                            <td><input type="checkbox" ng-model="item.IsShow" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top">
+                    <table>
+                        <tr>
+                            <td><p class="Asset4YearsAgo">経過年数４年以上</p></td>
+                        </tr>
+                        <tr>
+                            <td><p class="Asset5YearsAgo">経過年数５年以上</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>エクスポートの機能はありませんのでコピペで</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>エクセルに貼り付けてください。</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>抽出データが多い場合、ブラウザが固まる場合が</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>あります。条件を絞ってご利用ください。</p></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>同じ検索条件は現在のURLからアクセスできます。</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <button onclick="javascript:jsforce.browser.login();" ng-show="IsShowLoginButton">Login</button>
+        <Button ng-click="Search()">検索</Button>
+        <Button ng-click="GetData()" ng-show="IsShowGetDataButton">データ取得</Button>
+        <div>{{message}}</div>
+        <div>{{message2}}</div>
+    </div>
+
+    <!-- --------------------------------- 検索条件部分終わり --------------------------------- -->
+
+    <div>
+        <table border="1" cellspacing="1" cellpadding="1" align="left" class="table3" width="{{TableWidth}}">
+            <thead>
+                <tr>
+                    <th ng-repeat="item in AccountTable.ParentColumns" rowspan="{{item.RowSpan}}" colspan="{{item.ColSpan}}" ng-show="item.IsShow">{{item.HeaderTitle}}</th>
+                </tr>
+                <tr>
+                    <th ng-repeat="item2 in AccountTable.ChildrenColumns" ng-show="item2.ColumnHeader.IsShow">{{item2.HeaderTitle}}</th>
+                </tr>
+            </thead>
+            <tr ng-repeat="row in AccountTable.Rows" ng-class-even="'EvenRow'">
+                <td ng-repeat="cell in row.Cells" ng-show="cell.IsShow">
+                    <div ng-repeat="label in cell.Labels" class="{{label.Class}}">{{label.Text}}</div>
+                    <div ng-repeat="link in cell.Links"><a href="{{link.URL}}" target="_blank">{{link.LinkText}}</a></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- ------------通常切り取り終了場所-------------------------- -->
+
+    
+    <apex:iframe src="{!$Page.ALAssetList}" height="0px;" />
+
+    <script>
+
+var SearchCondition = (function () {
+    function SearchCondition() {
+        console.log('SearchCondition.constructor()');
+        this.NameFilter = '';
+        this.BedsFilter = 0;
+        this.HideColumnList = new Array();
+    }
+    return SearchCondition;
+})();
+var DataTable = (function () {
+    function DataTable(sc) {
+        this.SC = sc;
+        this.ParentColumns = new Array();
+        this.ChildrenColumns = new Array();
+        this.DataHeaderColumns = new Array();
+        this.DataColumns = new Array();
+        this.DataRows = new Array();
+        this.Rows = new Array();
+        this.ColumnAdd('No', 'No', 0, true, 1);
+        this.ColumnAdd('SSO', 'SSO2__c', 0, true, 1);
+        this.ColumnAdd('都道府県', 'ShippingState', 0, true, 1);
+        this.ColumnAdd('取引先名', 'Name', 0, true, 1);
+        this.ColumnAdd('Website', 'Website', 0, true, 1);
+        this.ColumnAdd('施設コード', 'CoreSystemCD__c', 0, true, 1);
+        this.ColumnAdd('旧日報施設コード', 'DialySystemCD__c', 0, true, 1);
+        this.ColumnAdd('郵便番号', 'ShippingPostalCode', 0, true, 1);
+        this.ColumnAdd('市区群', 'ShippingCity', 0, true, 1);
+        this.ColumnAdd('住所', 'ShippingStreet', 0, true, 1);
+        this.ColumnAdd('分類', 'Classification__c', 0, true, 2);
+        this.ColumnAdd('TEL', 'Phone', 0, true, 2);
+        this.ColumnAdd('試薬ランクCC', 'CCReagentSaleRank__c', 0, true, 2);
+        this.ColumnAdd('病床数', 'YBeds__c', 0, true, 2);
+        this.ColumnAdd('検体検査管理', 'Kentaikanri', 0, true, 2);
+        this.ColumnAdd('認定教育施設', 'AccreditedTrainingFacility', 0, true, 2);
+        this.ColumnAdd('医師会サーベイ', 'DSurvey', 0, true, 2);
+        this.ColumnAdd('技師会サーベイ', 'TSurvey', 0, true, 2);
+        this.ColumnAdd('CC担当者', 'CCUSER__r.Name', 0, true, 2);
+        this.ColumnAdd('商談', '商談', 3, true, 4);
+        this.ColumnAdd('納入商品追加', '', 0, true, 2);
+        this.ColumnAdd('電子カルテ', '電子カルテ', 1, true, 3);
+        this.ColumnAdd('検査システム', '検査システム', 1, true, 3);
+        this.ColumnAdd('A1c', 'A1c', 2, true, 3);
+        this.ColumnAdd('血糖', '血糖', 2, true, 3);
+        this.ColumnAdd('尿定性', '尿定性', 2, true, 3);
+        this.ColumnAdd('沈査', '沈査', 2, true, 3);
+        this.ColumnAdd('浸透圧', '浸透圧', 1, true, 3);
+        this.ColumnAdd('遺伝子', '遺伝子', 1, true, 3);
+        this.ColumnAdd('血算', '血算', 2, true, 3);
+        this.ColumnAdd('生化学', '生化学', 2, true, 3);
+        this.ColumnAdd('免疫', '免疫', 2, true, 3);
+        this.ColumnAdd('イムノクロマト', 'イムノクロマト', 1, true, 4);
+        this.ColumnAdd('電解質', '電解質', 2, true, 4);
+        this.ColumnAdd('CRP', 'CRP', 2, true, 4);
+        this.ColumnAdd('血ガス', '血ガス', 1, true, 4);
+        this.ColumnAdd('その他', 'その他', 1, true, 4);
+    }
+    DataTable.prototype.ColumnAdd = function (headertitle, path, columntype, IsShow, SearchConditionCol) {
+        var IsShow2 = true;
+        IsShow2 = IsShow;
+        if (this.SC) {
+            for (var index in this.SC.HideColumnList) {
+                if (this.SC.HideColumnList[index] == path) {
+                    IsShow2 = false;
+                }
+            }
+        }
+        var header = new DataTableColumnHeaderParent(headertitle, columntype, SearchConditionCol, IsShow2, path);
+        var datacolumn = new DataTableDataColumn();
+        datacolumn.Title = headertitle;
+        switch (columntype) {
+            case 0:
+                datacolumn.Title = headertitle;
+                datacolumn.Path = path;
+                datacolumn.IsShow = IsShow2;
+                this.DataHeaderColumns.push(datacolumn);
+                break;
+            default:
+                for (var index in header.Children) {
+                    var c = header.Children[index];
+                    c.ColumnHeader = header;
+                    this.ChildrenColumns.push(c);
+                    var datacolumn = new DataTableDataColumn();
+                    datacolumn.IsShow = IsShow2;
+                    datacolumn.Title = headertitle;
+                    datacolumn.Path = c.Path;
+                    this.DataColumns.push(datacolumn);
+                }
+                break;
+        }
+        this.ParentColumns.push(header);
+    };
+    return DataTable;
+})();
+var DataTableColumnHeaderChild = (function () {
+    function DataTableColumnHeaderChild() {
+        this.IsShow = true;
+    }
+    return DataTableColumnHeaderChild;
+})();
+var DataTableColumnHeaderParent = (function () {
+    function DataTableColumnHeaderParent(title, type, SearchConditionCol, IsShow, Path) {
+        this.IsShow = IsShow;
+        this.Path = Path;
+        this.SearchConditionCol = SearchConditionCol;
+        this.HeaderTitle = title;
+        this.ColumnType = type;
+        this.Children = new Array();
+        if (type == 0) {
+            this.RowSpan = 2;
+            this.ColSpan = 1;
+        }
+        else if (type == 1) {
+            var header1 = { HeaderTitle: '装置名', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductName__c' };
+            var header2 = { HeaderTitle: '売上日', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductionStartDate__c' };
+            this.Children.push(header1);
+            this.Children.push(header2);
+            this.RowSpan = 1;
+            this.ColSpan = this.Children.length;
+        }
+        else if (type == 2) {
+            var header1 = { HeaderTitle: '装置名', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductName__c' };
+            var header2 = { HeaderTitle: '売上日', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductionStartDate__c' };
+            var header3 = { HeaderTitle: '検体数', IsShow: true, ColumnHeader: this, Path: this.Path + '_TestCount' };
+            this.Children.push(header1);
+            this.Children.push(header2);
+            this.Children.push(header3);
+            this.RowSpan = 1;
+            this.ColSpan = this.Children.length;
+        }
+        else if (type == 3) {
+            var header1 = { HeaderTitle: '装置名', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductName__c' };
+            var header2 = { HeaderTitle: 'フェーズ', IsShow: true, ColumnHeader: this, Path: this.Path + '_StageName__c' };
+            var header3 = { HeaderTitle: '売上予定日', IsShow: true, ColumnHeader: this, Path: this.Path + '_ProductionStartDate__c' };
+            this.Children.push(header1);
+            this.Children.push(header2);
+            this.Children.push(header3);
+            this.RowSpan = 1;
+            this.ColSpan = this.Children.length;
+        }
+    }
+    return DataTableColumnHeaderParent;
+})();
+var DataTableDataColumn = (function () {
+    function DataTableDataColumn() {
+        this.Title = '';
+        this.IsShow = true;
+    }
+    return DataTableDataColumn;
+})();
+var DataTableDataHeaderColumn = (function () {
+    function DataTableDataHeaderColumn() {
+        this.Title = '';
+        this.IsShow = true;
+    }
+    return DataTableDataHeaderColumn;
+})();
+var DataTableDataRow = (function () {
+    function DataTableDataRow() {
+        this.Cells = new Array();
+    }
+    return DataTableDataRow;
+})();
+var DataTableDataCell = (function () {
+    function DataTableDataCell() {
+        this.Labels = new Array();
+        this.Links = new Array();
+        this.IsShow = true;
+    }
+    return DataTableDataCell;
+})();
+var LabelData = (function () {
+    function LabelData() {
+    }
+    return LabelData;
+})();
+var LinkData = (function () {
+    function LinkData() {
+    }
+    return LinkData;
+})();
+var Account = (function () {
+    function Account() {
+        this.Assets = new Array();
+        this.AssetGroup = new Array();
+        this.DataGroup = new Array();
+    }
+    return Account;
+})();
+var SfApp;
+(function (SfApp) {
+    var app1 = angular.module('app1', []);
+    var ctrl1 = app1.controller('ctrl1', function ($scope) {
+        $scope.StateArray = new Array();
+        $scope.StateArray = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '埼玉県', '茨城県', '栃木県', '群馬県', '長野県', '新潟県', '東京都', '千葉県', '神奈川県', '静岡県', '愛知県', '岐阜県', '三重県', '富山県', '石川県', '福井県', '滋賀県', '京都府', '奈良県', '大阪府', '兵庫県', '和歌山県', '岡山県', '広島県', '鳥取県', '島根県', '山口県', '香川県', '徳島県', '愛媛県', '高知県', '福岡県', '大分県', '佐賀県', '長崎県', '熊本県', '鹿児島県', '宮崎県', '沖縄県', 'すべて'];
+        $scope.SSOArray = ['01.札幌SSO', '02.仙台SSO', '03.さいたまSSO', '04.東京SSO', '05.名古屋SSO', '06.大阪SSO', '07.広島SSO', '08.福岡SSO', 'すべて'];
+        $scope.AccountTable = new DataTable(new SearchCondition());
+        $scope.conn = {};
+        $scope.Accounts = new Array();
+        $scope.SearchCondition = new SearchCondition();
+        $scope.SearchConditionJSON = '';
+        $scope.TableWidth = 2000;
+        $scope.IsShowLoginButton = false;
+        $scope.IsShowGetDataButton = false;
+        function GetCondition(urlparam) {
+            console.log('-GetCondition');
+            $scope.message2 = 'GetCondition';
+            var params = urlparam.split('&');
+            var param1 = params[0].substr(4, 18);
+            console.log(param1);
+            console.log($scope.conn);
+            $scope.conn.sobject("Idea").retrieve([param1], function (err, ret) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                var GetSearchConditionSearchCondition = ret[0].SearchCondition__c;
+                $scope.SearchConditionJSON = GetSearchConditionSearchCondition;
+                $scope.SearchCondition = JSON.parse(GetSearchConditionSearchCondition);
+                $scope.$apply();
+                $scope.ShowResult();
+            });
+            var SearchConditionDisplay = (urlparam.indexOf("SearchConditionDisplay=none") > 0);
+            if (SearchConditionDisplay) {
+                $scope.SearchConditionDisplay = 'display:none';
+            }
+            $scope.message2 = '';
+        }
+        $scope.SetConnection = function (conn) {
+            $scope.conn = conn;
+            console.log('-SetConnection');
+            if (location.hostname == 'localhost') {
+                $scope.IsShowLoginButton = true;
+                $scope.IsShowGetDataButton = true;
+            }
+        };
+        $scope.GetSearchCondition = function () {
+            console.log('-GetSearchCondition');
+            $scope.message2 = 'GetSearchCondition';
+            var urlparam = location.search;
+            if (urlparam.length > 0) {
+                if (location.hostname == 'localhost') {
+                }
+                else {
+                    GetCondition(urlparam);
+                }
+            }
+        };
+        $scope.GetData = function () {
+            console.log('-GetData');
+            $scope.message2 = 'GetData';
+            var urlparam = location.search;
+            if (urlparam.length > 0) {
+                if (location.hostname == 'localhost') {
+                    GetCondition(urlparam);
+                }
+                else {
+                }
+            }
+        };
+        $scope.Search = function () {
+            console.log('-Search');
+            $scope.message2 = 'Search';
+            var parentcols;
+            parentcols = $scope.AccountTable.ParentColumns;
+            $scope.SearchCondition.HideColumnList = new Array();
+            parentcols.forEach(function (p) {
+                if (p.IsShow == false) {
+                    $scope.SearchCondition.HideColumnList.push(p.Path);
+                }
+            });
+            $scope.SearchConditionJson = JSON.stringify($scope.SearchCondition);
+            $scope.conn.sobject('Idea').create({ CommunityId: '09a5F000000L9KfQAK', Title: 'SC', Body: 'SC', Status: '', Categories: '', SearchCondition__c: $scope.SearchConditionJson }, function (err, ret) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                var ideaid = ret.id;
+                console.log(ideaid);
+                document.location.href = "?id=" + ideaid;
+                return;
+            });
+            return;
+        };
+        $scope.ShowResult = function () {
+            $scope.message = 'データを取得しています。データ件数が多い場合、数分かかる場合があります。しばらくお待ちください・・・';
+            console.log('-ShowResult');
+            var sc = $scope.SearchCondition;
+            console.log(sc);
+            $scope.AccountTable = new DataTable(sc);
+            var SQL = 'SELECT Id,AccountAddInfo__c, Name,SSO2__c,ShippingPostalCode,ShippingState,ShippingCity,ShippingStreet,Phone,CoreSystemCD__c,TDFKNumber__c,CCUSER__r.Name, YBeds__c,Classification__c,HbA1c__c,GLU__c,UrineQualitative__c,UrinarySediment__c,CBC__c,Biochemistry__c,Electrolyte__c,CRP__c,Item157__c,Item158__c,Item159__c,Item160__c,AccreditedTrainingFacility__c,DSurvey__c,TSurvey__c,CCReagentSaleRank__c,Website,DialySystemCD__c,';
+            SQL = SQL + '  (SELECT Account__c, Id, Name,CategoryName1__c,CategoryName2__c,ProductName__c,ELAPSEDYEARS__c,ProductionStartDate__c FROM Account_Assets__r WHERE IsOperationEnd__c = false),';
+            SQL = SQL + '  (SELECT Id, Name, StageName__c, ProductName__c, ProductPhase__c, CloseDate__c FROM OpportunityLineItems__r)  ';
+            SQL = SQL + 'FROM Account WHERE (name <> \'\') ';
+            if ($scope.SearchCondition.SSO !== 'すべて') {
+                SQL = SQL + 'AND SSO2__c = \'' + $scope.SearchCondition.SSO + '\' ';
+            }
+            if ($scope.SearchCondition.state !== 'すべて') {
+                SQL = SQL + 'AND ShippingState = \'' + $scope.SearchCondition.state + '\' ';
+            }
+            if ($scope.SearchCondition.classification === 'すべて') {
+            }
+            else if ($scope.SearchCondition.classification === 'すべて（卸・薬局以外）') {
+                SQL = SQL + 'AND ((Classification__c = \'卸\') or (Classification__c = \'薬局\')) ';
+            }
+            else {
+                SQL = SQL + 'AND Classification__c = \'' + $scope.SearchCondition.classification + '\' ';
+            }
+            if ($scope.SearchCondition.NameFilter !== '') {
+                if ($scope.SearchCondition.NameFilter !== undefined) {
+                    SQL = SQL + 'AND Name LIKE \'%' + $scope.SearchCondition.NameFilter + '%\' ';
+                }
+            }
+            if ($scope.SearchCondition.CCUSERFilter !== '') {
+                if ($scope.SearchCondition.CCUSERFilter !== undefined) {
+                    SQL = SQL + 'AND CCUSER__r.Name LIKE \'%' + $scope.SearchCondition.CCUSERFilter + '%\' ';
+                }
+            }
+            if ($scope.SearchCondition.Kentai) {
+                SQL = SQL + 'AND ((Item157__c = true) OR (Item158__c = true) OR (Item159__c = true) OR (Item160__c = true)) ';
+            }
+            if ($scope.SearchCondition.Nintei) {
+                SQL = SQL + 'AND (AccreditedTrainingFacility__c = true) ';
+            }
+            if ($scope.SearchCondition.Ishikai) {
+                SQL = SQL + 'AND (DSurvey__c = true) ';
+            }
+            if ($scope.SearchCondition.Gishikai) {
+                SQL = SQL + 'AND (TSurvey__c = true) ';
+            }
+            if ($scope.SearchCondition.JDDM) {
+                SQL = SQL + 'AND (JDDM__c = true) ';
+            }
+            if ($scope.SearchCondition.BedsFilter) {
+                SQL = SQL + 'AND YBeds__c >= ' + $scope.SearchCondition.BedsFilter + ' ';
+            }
+            if ($scope.SearchCondition.CCReagentSaleRank__c) {
+                SQL = SQL + 'AND (CCReagentSaleRank__c <> \'\') ';
+            }
+            SQL = SQL + ' ORDER BY SSO2__c,TDFKNumber__c,ShippingState ';
+            console.log(SQL);
+            $scope.rows = [];
+            var rowindex = 0;
+            $scope.conn.query(SQL)
+                .on("record", function (record) {
+                rowindex++;
+                var row = new Account();
+                var NewRow = new DataTableDataRow();
+                row.No = rowindex;
+                row.Id = record.Id;
+                row.HbA1c__c = record.HbA1c__c;
+                row.GLU__c = record.GLU__c;
+                row.UrineQualitative__c = record.UrineQualitative__c;
+                row.UrinarySediment__c = record.UrinarySediment__c;
+                row.CBC__c = record.CBC__c;
+                row.Biochemistry__c = record.Biochemistry__c;
+                row.Electrolyte__c = record.Electrolyte__c;
+                row.CRP__c = record.CRP__c;
+                row.Kentaikanri = '';
+                if (record.Item157__c) {
+                    row.Kentaikanri = row.Kentaikanri + 'Ⅰ';
+                }
+                if (record.Item158__c) {
+                    row.Kentaikanri = row.Kentaikanri + 'Ⅱ';
+                }
+                if (record.Item159__c) {
+                    row.Kentaikanri = row.Kentaikanri + 'Ⅲ';
+                }
+                if (record.Item160__c) {
+                    row.Kentaikanri = row.Kentaikanri + 'Ⅳ';
+                }
+                if (record.AccreditedTrainingFacility__c) {
+                    row.AccreditedTrainingFacility = '○';
+                }
+                if (record.DSurvey__c) {
+                    row.DSurvey = '○';
+                }
+                if (record.TSurvey__c) {
+                    row.TSurvey = '○';
+                }
+                row.DataGroup = new Array();
+                if (record.Account_Assets__r) {
+                    record.Account_Assets__r.records.forEach(function (e2) {
+                        row.Assets.push(e2);
+                    });
+                    $scope.AccountTable.DataColumns.forEach(function (e4) {
+                        var cellline = new Array();
+                        row.DataGroup[e4.Path] = new Array();
+                        switch (e4.Path) {
+                            case 'A1c_TestCount':
+                                if (row.HbA1c__c) {
+                                    row.DataGroup[e4.Path].push(row.HbA1c__c);
+                                }
+                                ;
+                                break;
+                            case '血糖_TestCount':
+                                if (row.GLU__c) {
+                                    row.DataGroup[e4.Path].push(row.GLU__c);
+                                }
+                                ;
+                                break;
+                            case '尿定性_TestCount':
+                                if (row.UrineQualitative__c) {
+                                    row.DataGroup[e4.Path].push(row.UrineQualitative__c);
+                                }
+                                ;
+                                break;
+                            case '沈査_TestCount':
+                                if (row.UrinarySediment__c) {
+                                    row.DataGroup[e4.Path].push(row.UrinarySediment__c);
+                                }
+                                ;
+                                break;
+                            case '血算_TestCount':
+                                if (row.CBC__c) {
+                                    row.DataGroup[e4.Path].push(row.CBC__c);
+                                }
+                                ;
+                                break;
+                            case '生化学_TestCount':
+                                if (row.Biochemistry__c) {
+                                    row.DataGroup[e4.Path].push(row.Biochemistry__c);
+                                }
+                                ;
+                                break;
+                            case '電解質_TestCount':
+                                if (row.Electrolyte__c) {
+                                    row.DataGroup[e4.Path].push(row.Electrolyte__c);
+                                }
+                                ;
+                                break;
+                            case 'CRP_TestCount':
+                                if (row.CRP__c) {
+                                    row.DataGroup[e4.Path].push(row.CRP__c);
+                                }
+                                ;
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                    row.Assets.forEach(function (e3) {
+                        var line = e3.ProductName__c;
+                        var catename = e3.CategoryName2__c;
+                        var key = catename + "_ProductName__c";
+                        if (row.DataGroup[key]) {
+                            row.DataGroup[key].push(e3);
+                        }
+                        var key2 = catename + "_ProductionStartDate__c";
+                        if (row.DataGroup[key2]) {
+                            row.DataGroup[key2].push(e3);
+                        }
+                        var key3 = catename + "_TestCount";
+                        if (row.DataGroup[key3]) {
+                        }
+                    });
+                }
+                if (record.OpportunityLineItems__r) {
+                    row.DataGroup['商談_ProductName__c'] = new Array();
+                    row.DataGroup['商談_StageName__c'] = new Array();
+                    row.DataGroup['商談_ProductionStartDate__c'] = new Array();
+                    var cellname = new DataTableDataCell();
+                    var celldate = new DataTableDataCell();
+                    record.OpportunityLineItems__r.records.forEach(function (o) {
+                        row.DataGroup['商談_ProductName__c'].push(o);
+                        row.DataGroup['商談_StageName__c'].push(o);
+                        row.DataGroup['商談_ProductionStartDate__c'].push(o);
+                    });
+                }
+                var parentcols;
+                parentcols = $scope.AccountTable.ParentColumns;
+                parentcols.forEach(function (p) {
+                    if (p.ColumnType == 0) {
+                        if (p.Path == 'No') {
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            var RowDataLabel = new LabelData();
+                            RowDataLabel.Text = rowindex.toString();
+                            cell.Labels.push(RowDataLabel);
+                            NewRow.Cells.push(cell);
+                        }
+                        else if (p.Path == 'Name') {
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            var RowDataLink = new LinkData();
+                            RowDataLink.LinkText = record[p.Path];
+                            RowDataLink.URL = '/' + row.Id;
+                            cell.Links.push(RowDataLink);
+                            NewRow.Cells.push(cell);
+                        }
+                        else if (p.Path == 'Website') {
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            var RowDataLink = new LinkData();
+                            RowDataLink.LinkText = record[p.Path];
+                            RowDataLink.URL = record[p.Path];
+                            cell.Links.push(RowDataLink);
+                            NewRow.Cells.push(cell);
+                        }
+                        else {
+                            var text = record[p.Path];
+                            if (p.Path == 'CCUSER__r.Name') {
+                                if (record['CCUSER__r'] != null) {
+                                    if (record['CCUSER__r'].Name != null) {
+                                        text = record['CCUSER__r'].Name;
+                                    }
+                                }
+                            }
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            var RowDataLabel = new LabelData();
+                            RowDataLabel.Text = text;
+                            cell.Labels.push(RowDataLabel);
+                            NewRow.Cells.push(cell);
+                        }
+                    }
+                    else if ((p.ColumnType == 1) || (p.ColumnType == 2)) {
+                        p.Children.forEach(function (c) {
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            if (row.DataGroup[c.Path]) {
+                                row.DataGroup[c.Path].forEach(function (t) {
+                                    if (c.Path.indexOf('_ProductName__c') > 0) {
+                                        var RowDataLink = new LinkData();
+                                        RowDataLink.LinkText = t.ProductName__c;
+                                        RowDataLink.URL = '/' + t.Id;
+                                        cell.Links.push(RowDataLink);
+                                    }
+                                    else if (c.Path.indexOf('_ProductionStartDate__c') > 0) {
+                                        var RowDataLabel = new LabelData();
+                                        RowDataLabel.Text = t.ProductionStartDate__c;
+                                        if (t.ELAPSEDYEARS__c) {
+                                            if (t.ELAPSEDYEARS__c != null) {
+                                                if (t.ELAPSEDYEARS__c >= 5) {
+                                                    RowDataLabel.Class = 'Asset5YearsAgo';
+                                                }
+                                                else if (t.ELAPSEDYEARS__c >= 4) {
+                                                    RowDataLabel.Class = 'Asset4YearsAgo';
+                                                }
+                                            }
+                                        }
+                                        cell.Labels.push(RowDataLabel);
+                                    }
+                                    else {
+                                        var RowDataLabel = new LabelData();
+                                        RowDataLabel.Text = t;
+                                        cell.Labels.push(RowDataLabel);
+                                    }
+                                });
+                            }
+                            NewRow.Cells.push(cell);
+                        });
+                    }
+                    else if (p.ColumnType == 3) {
+                        p.Children.forEach(function (c) {
+                            var cell = new DataTableDataCell();
+                            cell.IsShow = p.IsShow;
+                            cell.ColumnHeader = p;
+                            if (row.DataGroup[c.Path]) {
+                                row.DataGroup[c.Path].forEach(function (t) {
+                                    if (c.Path.indexOf('_ProductName__c') > 0) {
+                                        var RowDataLink = new LinkData();
+                                        RowDataLink.LinkText = t.ProductName__c;
+                                        RowDataLink.URL = '/' + t.Id;
+                                        cell.Links.push(RowDataLink);
+                                    }
+                                    else if (c.Path.indexOf('_StageName__c') > 0) {
+                                        var RowDataLabel = new LabelData();
+                                        RowDataLabel.Text = t.StageName__c;
+                                        cell.Labels.push(RowDataLabel);
+                                    }
+                                    else {
+                                        var RowDataLabel = new LabelData();
+                                        RowDataLabel.Text = t.CloseDate__c;
+                                        cell.Labels.push(RowDataLabel);
+                                    }
+                                });
+                            }
+                            NewRow.Cells.push(cell);
+                        });
+                    }
+                });
+                $scope.AccountTable.Rows.push(NewRow);
+                $scope.AccountTable.DataRows.push(row);
+                $scope.Accounts.push(row);
+            })
+                .on("end", function (query) {
+                $scope.message = '';
+                console.log('end');
+                $scope.$apply();
+            })
+                .on("error", function (err) {
+                console.error(err);
+            })
+                .run({ autoFetch: true, maxFetch: 4000 });
+        };
+    });
+})(SfApp || (SfApp = {}));
+var Asset = (function () {
+    function Asset() {
+    }
+    return Asset;
+})();
+//# sourceMappingURL=app.js.map
+
+    </script>   
+
+
+  <iframe src="/apex/ALAssetList" name="sidebarViewPage" frameborder="0" height="0" allowtransparency="true"></iframe>
+  </body>
+</html>
+</apex:page>

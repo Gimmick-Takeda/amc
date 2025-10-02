@@ -1,0 +1,9 @@
+<apex:page standardController="Task">
+    <apex:form >
+        <apex:detail />    
+    </apex:form>
+
+    
+
+    
+</apex:page>

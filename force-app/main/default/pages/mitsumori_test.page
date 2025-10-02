@@ -1,0 +1,85 @@
+<!-- このコードは OPROARTS Live - Force.com API の利用サンプル として OPROARTS Live サーバで生成されました。 -->
+<!-- OPROARTS Live - Force.com API の情報は、https://www.opro.net/support/ からご覧になれます。 -->
+<!-- Visualforce の情報は、http://www.salesforce.com/us/developer/docs/pages/index.htm (Salesforce.com) からご覧になれます。 -->
+
+<apex:page standardController="Opportunity__c" standardStylesheets="false" showHeader="false" sidebar="false"
+        applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>custom button</title>
+<apex:slds />
+</head>
+<body>
+<div class="slds-scope">
+    <div class="slds-p-vertical_x-small">
+        <h1 class="slds-text-heading_small">実行しています...</h1>
+        <p class="slds-text-body_regular">
+            <a href="#" onclick="submitAction();">自動的に開始されない場合はこのリンクをクリックしてください。</a>
+        </p>
+    </div>
+</div>
+<script type="text/javascript" src="/canvas/sdk/js/publisher.js"></script>
+<script type="text/javascript" src="https://s.oproarts.com/js/live_ff-1.50.js"></script>
+<script type="text/javascript">
+function submitAction() {
+    OPROARTS.Live.fF.action({
+
+        // tp: 配備済みテンプレートの名称を指定します。複数指定することもできます。
+        // このパラメータを省略することはできません。
+        // ※ 出力形式がExcelブックやWord文書やPowerPointプレゼンテーションの場合、テンプレート作成時に指定したテンプレートファイルの拡張子を付与してください。
+        tp:[
+            "Mitsumori_006c"
+        ],
+
+        // fe: フォントの埋め込むかどうかを指定します。true もしくは false で指定します。
+        // 実行するメソッドが ".pdf()" または ".pdfPreview()" の場合に有効です。
+        // また、テンプレートで埋め込み可能なフォントが使用されている必要があります。
+        fe:false,
+
+        // createsFileAttach: 作成されたドキュメントをオブジェクトに添付するかどうかを指定します。true もしくは false で指定します。
+        // 添付できないオブジェクトの場合、このパラメータを true で指定しないでください。
+        createsFileAttach:false, // Salesforce Filesへアップロード(ContentVersionオブジェクトへのアップロード)
+        // createsAttach:false, // 添付ファイル(Attachment)オブジェクトへアップロード
+
+        // 作成されたドキュメントをオブジェクトに添付する際に、添付するファイルの所有者を指定します。オブジェクトIDを指定します。
+        // attachOwnerId:"{!JSENCODE($User.Id)}",
+
+        // createsTask: 作成されたドキュメントを活動履歴に登録するかどうかを指定します。true もしくは false で指定します。
+        // 活動履歴に登録できないオブジェクトの場合、このパラメータを true で指定しないでください。
+        // このパラメータに true を指定した場合、次の追加パラメータを指定することができます。
+        // - taskSubject: 活動履歴の件名
+        // - taskComment: 活動履歴のコメント
+        // 無指定の場合は、システムの初期値が適用されます。
+        createsTask:false,
+
+        // title: ダウンロード・添付・活動履歴のファイル名を指定します。
+        title:"",
+
+        // objectId: 帳票オブジェクトのIDを指定します。
+        objectId: "{!JSENCODE(Opportunity__c.Id)}",
+
+        // OPROARTS Live - Force.com API に必要な諸パラメータです。
+        // このパラメータを編集しないでください。
+        _type: "live.forward",
+        api:["{!JSENCODE($Organization.Id)}","{!JSENCODE($User.Id)}","{!JSENCODE($Api.Session_ID)}","{!JSENCODE($Api.Partner_Server_URL_220)}"]
+
+    }).url('https://www.oproarts.com/liveffb/action').withS1('')
+    .pdf(); // 作成するドキュメントの形式のメソッドを呼び出します。
+    // Live for Salesforceのテンプレートの場合は以下が指定できます。
+    // .pdf(); // PDFファイルを出力します。
+    // .opr(); //  OPRファイルを出力します。 ※OPRO X Browser をクライアントPCにインストールしてください。
+    // .print(); // ODPファイルを出力します。※OPRO X Browser をクライアントPCにインストールしてください。
+    // .pdfPreview(); // PDFファイル(プレビュー)を出力します。※この出力はカウントされません。
+    // .oprPreview(); // OPRファイル(プレビュー)を出力します。※この出力はカウントされません。
+    // Live XLS for Salesforceのテンプレートの場合は以下が指定できます。
+    // .excelMerge()' : Excelブックを出力します。
+
+    OPROARTS.Live.fF.publisherClose();
+}
+OPROARTS.Live.fF.addOnLoadHandler(function () { submitAction(); });
+</script>
+</body>
+</html>
+</apex:page>

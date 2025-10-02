@@ -1,0 +1,9 @@
+<apex:page controller="SmileTranslateApplyAutoController" >
+    <apex:form >
+        <apex:inputTextarea id="Input" value="{!InputText}" rows="20" cols="100" ></apex:inputTextarea><br/>
+        <apex:commandButton value="登録" action="{!ApplyAuto}"></apex:commandButton><br/>
+                <apex:outputLabel id="Output" value="{!Message}" />
+    </apex:form> 
+
+
+</apex:page>

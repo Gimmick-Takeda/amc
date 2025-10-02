@@ -1,0 +1,7 @@
+<apex:page controller="OpportunityCustomController"  lightningStylesheets="true">
+<apex:pageBlock>
+    <apex:pageBlockTable value="{!oli}" var="opl">
+         <apex:column value="{!opl.ProductName__c}"/>
+    </apex:pageBlockTable>
+</apex:pageBlock>
+</apex:page>

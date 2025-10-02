@@ -1,0 +1,8 @@
+<apex:page Controller="TaskCustomController" >
+   <h1>ToDoの任命先を{!$User.Alias}に変更いたします。</h1>
+  <apex:form >
+      <apex:commandbutton action="{!Go}" value="実行">
+          <apex:param name="TaskId" value="{Id}" />
+      </apex:commandButton>
+  </apex:form>
+</apex:page>

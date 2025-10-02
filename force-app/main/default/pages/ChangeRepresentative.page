@@ -1,0 +1,54 @@
+<apex:page Controller="ChangeRepresentativeController">
+
+
+  <apex:form >
+    <apex:pageBlock >
+    <apex:outputlabel >{!HitCount}</apex:outputlabel>
+    <apex:pageBlockSection title="検索条件" >
+      <apex:outputlabel >都道府県</apex:outputlabel>
+      <apex:inputText value="{!State}"/>
+      <apex:outputlabel >市区郡</apex:outputlabel>
+      <apex:inputText value="{!City}"/>
+      <apex:outputlabel >住所</apex:outputlabel>
+      <apex:inputText value="{!Street}"/>
+      <apex:outputlabel >分類</apex:outputlabel>
+      <apex:inputText value="{!Classification}"/>
+      
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockSection title="新担当者"  >
+      <apex:inputField value="{!NewOwner.Name}" />
+      <apex:inputtext value="{!NewOwnerShearch }"/>
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockButtons >
+      <apex:commandButton action="{!Search}" value="取引先検索">
+      </apex:commandButton>
+      <apex:commandButton action="{!OwnerSearch}" value="担当者検索">
+      </apex:commandButton>
+      <apex:commandButton action="{!SelectAll}" value="全選択">
+      </apex:commandButton>
+      <apex:commandButton action="{!Deselect}" value="全解除">
+      </apex:commandButton>      
+      <apex:commandButton action="{!UpdateData}" value="データ更新">
+      </apex:commandButton>   
+    </apex:pageBlockButtons>
+
+    <apex:pageBlockSection title="担当者情報">
+
+      <apex:pageBlockTable value="{!Accounts}" var="ac">
+        <apex:column >
+          <apex:facet name="header"><apex:inputCheckbox /></apex:facet>
+          <apex:inputCheckbox value="{!ac.Selected}"/>
+        </apex:column>
+        <apex:column value="{!ac.AAI.Account__r.Name}"/>
+        <apex:column value="{!ac.AAI.Account__r.ShippingState}"/>
+        <apex:column value="{!ac.AAI.Account__r.ShippingCity}"/>
+        <apex:column value="{!ac.AAI.Account__r.ShippingStreet}"/>
+        <apex:column value="{!ac.AAI.Account__r.Classification__c}"/>
+      </apex:pageBlockTable>
+    </apex:pageBlockSection>
+  </apex:pageBlock>
+</apex:form>
+
+</apex:page>

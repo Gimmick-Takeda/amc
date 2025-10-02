@@ -1,0 +1,10 @@
+<apex:page standardController="Opportunity__c" lightningStylesheets="true">
+   <apex:pageBlock title="商談商品">
+      <apex:pageBlockTable value="{!Opportunity__c.OPOLRelated__r}" var="opl">
+         <apex:column value="{!opl.ProductName__c}"/>
+         <apex:column value="{!opl.Quantity__c}"/>
+         <apex:column value="{!opl.Subtotal__c}"/>
+         <apex:column value="{!opl.Quota_Check__c}"/>
+      </apex:pageBlockTable>
+   </apex:pageBlock>
+</apex:page>

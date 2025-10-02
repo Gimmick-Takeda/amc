@@ -1,0 +1,149 @@
+<apex:page docType="html-5.0" showHeader="false" title="市場情報" cache="false" applyHtmlTag="false" applyBodyTag="false">
+<html ng-app='myapp'>
+  <head>
+    <style type="text/css">
+      .table3 {
+        border-collapse: collapse;
+      }
+      .table3 th {
+        background-color: #cccccc;
+      }
+      .Asset4YearsAgo {
+        background-color: Yellow;
+      }
+      .Asset5YearsAgo {
+        background-color: Red;
+      }
+    </style>
+    <apex:includeScript value="{!URLFOR($Resource.JSforce)}" />
+    <apex:includeScript value="{!URLFOR($Resource.jQuery)}" />  
+    <apex:includeScript value="{!URLFOR($Resource.angularjs)}" />
+    
+    
+    <script type="text/javascript">
+      window.onload = function(){
+        }
+    </script>   
+
+    
+    
+    </head>
+    <body id="body" ng-controller="ctrl2">
+      <p>都道府県    取引先    担当者名</p>
+      <textarea cols="100" rows="20" ng-model="Source"></textarea><br />
+      <button ng-Click="TextSplit()">テキスト分解</button>
+      <button ng-Click="AccountMatch()">取引先マッチング</button>
+      <button ng-Click="SearchPerson()">担当者データマッチング</button>
+      <button ng-Click="UpdateScreen()">画面更新</button>       
+      <button ng-Click="UpdatePerson()">データ更新</button>       
+      
+      <div>{{message}}</div>
+      <table border="1" cellspacing="1" cellpadding="1">
+        <tr ng-repeat="account in accounts">
+          <td>{{account.sourcestate}}</td>
+          <td>{{account.sourcename}}</td>
+          <td>{{account.sourceperson}}</td>                              
+          <td>{{account.Id}}</td>
+          <td>{{account.Name}}</td>            
+          <td>{{account.AccountAddInfoId}}</td>             
+          <td>{{account.ThisTimeUserName}}</td>               
+          <td>{{account.UserId}}</td>    
+          <td>{{account.UserName}}</td>                   
+        </tr>
+      </table>
+      
+    <script type="text/javascript">
+      var ng = angular.module('myapp',[]);
+      var ctrl2 = ng.controller('ctrl2',function($scope)
+      {
+        $scope.accounts = [];
+        $scope.Source = '';
+        $scope.message = '';
+        // テキスト分解
+        $scope.TextSplit = function(){
+          var searchsource = $scope.Source;
+          var splitsource = searchsource.split('\n');
+          splitsource.forEach(function(value,index,ar){
+            var items = value.split('\t');
+            $scope.accounts.push({"sourcestate":items[0],"sourcename":items[1],"sourceperson":items[2]});
+          });
+          //$score.$apply();          
+        }
+        // 取引先マッチング
+        $scope.AccountMatch = function(){
+          var conn = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });          
+          $scope.accounts.forEach(function(value,index,ar){
+            var sql = 'SELECT Id,Name,ShippingState,AccountAddInfo__c,CCUSER__c FROM Account WHERE ShippingState=\'' + value.sourcestate + '\' AND Name =\'' + value.sourcename + '\'';
+            conn.query(sql)
+            .on("record",function(record){
+            $scope.accounts[index].Id = record.Id;                
+            $scope.accounts[index].Name = record.Name;      
+            $scope.accounts[index].AccountAddInfoId = record.AccountAddInfo__c; 
+            $scope.accounts[index].CCUserId = record.CCUSER__c;             
+            $scope.accounts[index].ThisTimeUserName = record.CCUSER__c;   
+            })
+            .on("end",function(query){
+            })
+            .on("error", function(err) {
+            })
+            .run({ autoFetch : true, maxFetch : 4000 });          
+            });
+        }        
+        
+        // 担当者マスタ取得
+        $scope.SearchPerson = function(){
+          $scope.accounts.forEach(function(value,index,ar){
+            var conn2 = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });                  
+            var sqlperson = 'SELECT Id,Name FROM User WHERE Name = \'' + value.sourceperson + '\'';
+            conn2.query(sqlperson)
+                .on("record",function(record){
+                  $scope.accounts[index].UserId = record.Id;
+                  $scope.accounts[index].UserName = record.Name;              
+                })
+                .on("end",function(query){
+                })
+                .on("error", function(err) {
+                })
+                .run({ autoFetch : true, maxFetch : 4000 });      
+       
+            var sqlperson2 = 'SELECT Id,Name FROM User WHERE Id = \'' + $scope.accounts[index].CCUserId + '\'';       
+            conn2.query(sqlperson2)
+                .on("record",function(record){
+                  $scope.accounts[index].ThisTimeUserName = record.Name;              
+                })
+                .on("end",function(query){
+                })
+                .on("error", function(err) {
+                })
+                .run({ autoFetch : true, maxFetch : 4000 });   
+            });
+          }
+          
+          $scope.UpdatePerson = function(){
+              console.log('UpdatePerson');
+              var conn3 = new jsforce.Connection({ accessToken: '{!$Api.Session_Id}' });     
+              $scope.accounts.forEach(function(value,index,ar){
+                $scope.message = $scope.accounts[index].name;
+                console.log(index);
+                console.log($scope.accounts[index].name);
+                conn3.sobject("AccountAddInfo__c").update({ 
+                  Id : value.AccountAddInfoId,
+                  CCUSER__c : value.UserId 
+                }, function(err, ret) {
+                  if (err || !ret.success) { return console.error(err, ret); }
+                });  
+                
+              });
+            }
+          
+          $scope.UpdateScreen = function(){
+            $scope.$apply();
+          }
+      });
+    </script>    
+      
+      
+    </body>
+
+</html>
+</apex:page>

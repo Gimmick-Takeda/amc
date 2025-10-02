@@ -1,0 +1,32 @@
+<apex:page docType="html-5.0" title="jQuery UIの練習" showHeader="true" sidebar="false">
+    <apex:include pageName="jQueryUILibrary"/>
+    <apex:include pageName="JQueryUI_DraggableCss"/>
+    <apex:form >
+        <div id="box"></div>
+    </apex:form>
+    <apex:include pageName="JQueryUI_DraggableScript"/>
+    <apex:includescript value="{!URLFOR($Resource.firstjs)}" />
+    <apex:includescript value="{!URLFOR($Resource.jQuery)}" />
+    <button onclick="sayHello()">
+        Hello
+    </button>
+    <p id="message">
+        メッセージ
+    </p>
+    <div id="data">
+    </div>
+    <script>
+        function sayHello2(){
+            alert('hello');
+        }
+    </script>
+    <script src="Scripts/first.js"></script>     
+    <script>
+        $('#message').css('color','red');
+        var data = $.get('https://ap.salesforce.com/services/data/v28.0/sobjects/Account/0011000000V8ESH',{
+            
+        },function(data){
+            $('#data').html(data);
+        });
+    </script>
+</apex:page>
