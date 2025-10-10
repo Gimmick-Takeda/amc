@@ -32,6 +32,20 @@ public class SetQuotationTypeTest {
             opp.ServiceProposal__c = '卸経由';
             opportunities.add(opp);
         }
+
+        // qt4の条件分岐用商談作成
+
+        Opportunity__c opp1 = new Opportunity__c();
+        opp1.Account__c = acc.Id;
+        opp1.QuotationType__c = quotationTypes[0];
+        opp1.ServiceProposal__c = '提案なし';
+        opportunities.add(opp1);
+
+        Opportunity__c opp2 = new Opportunity__c();
+        opp2.Account__c = acc.Id;
+        opp2.QuotationType__c = quotationTypes[0];
+        opp2.ServiceProposal__c = '直販';
+        opportunities.add(opp2);
         
         insert opportunities;
 
