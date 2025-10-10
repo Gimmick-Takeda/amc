@@ -63,7 +63,7 @@ public class SetQuotationType {
     public String qt4 {
         get {
             String QNo4 = opp.QuotationType__c.left(3);
-            if (opp.ServiceProposal__c == '提案なし' || opp.ServiceProposal__c == '' || opp.ServiceCount__c == 0) {
+            if (opp.ServiceProposal__c == '提案なし' || opp.ServiceProposal__c == null || opp.ServiceCount__c == 0) {
                 ST = '';
             } else if (opp.ServiceProposal__c == '直販' && (QNo4 == '01：' || QNo4 == '03：'|| QNo4 == '05：')){
                 ST = '';
