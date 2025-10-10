@@ -43,36 +43,34 @@ public class SetQuotationTypeTest {
         insert prod;
 
         // 商談商品(保守)を作成
+        List<OpportunityLineItem__c> opls = new List<OpportunityLineItem__c>();
         for(Integer i = 0; i < opportunities.size(); i++) {
             OpportunityLineItem__c opl = new OpportunityLineItem__c();
             opl.Opportunity__c = opportunities[i].Id;
             opl.Product__c = prod.Id;
+            opl.RecordTypeId = '012BC000000W8nFYAS';
+            opls.add(opl);
         }
-        insert opl;
+        insert opls;
     }
     
     static testMethod void testMethodAll() {
 
         List<Opportunity__c> opps = [SELECT Id FROM Opportunity__c WHERE Account__r.Name='株式会社Company'];
         
+        Test.startTest();
         for(Opportunity__c opp : opps) {
             PageReference pageRef = Page.Make_Quota_Preview;
             pageRef.getParameters().put('id', opp.Id);
             Test.setCurrentPage(pageRef);
-            
-            Test.startTest();
-
             ApexPages.StandardController stdController = new ApexPages.StandardController(opp);
-            
             SetQuotationType extController = new SetQuotationType(stdController);
-            
             System.assertEquals(extController.qt1 == null, false);
             System.assertEquals(extController.qt2 == null, false);
             System.assertEquals(extController.qt4 == null, false);
             extController.getQt3();
-            
-            Test.stopTest();
         }
+        Test.stopTest();
     }
     
 }
