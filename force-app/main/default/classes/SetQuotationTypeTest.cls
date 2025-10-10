@@ -6,131 +6,73 @@ public class SetQuotationTypeTest {
         Account acc = new Account();
         acc.Name = '株式会社Company';
         insert acc;
+
+        // すべての分岐をカバーするOpportunity__cレコードを作成
+        List<Opportunity__c> opportunities = new List<Opportunity__c>();
         
-        Account acc2 = new Account();
-        acc2.Name = '株式会社Company2';
-        insert acc2;
+        // qt1, qt2, getQt3の分岐をカバー
+        String[] quotationTypes = new String[]{
+            '01：個別価格タイプ（卸）',
+            '01b：個別価格タイプ（相見積）',
+            '02：個別価格タイプ（施設）',
+            '03：一括値引タイプ（卸）',
+            '03b：一括値引タイプ（相見積）',
+            '04：一括値引タイプ（施設）',
+            '05：一式見積タイプ（卸）',
+            '05b：一式見積タイプ（相見積）',
+            '06：一式見積タイプ（施設）',
+            '07：BGM専用見積（卸）',
+            '08：BGM専用見積（施設）'
+        };
         
-        Account acc3 = new Account();
-        acc3.Name = '株式会社Company3';
-        insert acc3;
+        for(Integer i = 0; i < quotationTypes.size(); i++) {
+            Opportunity__c opp = new Opportunity__c();
+            opp.Account__c = acc.Id;
+            opp.QuotationType__c = quotationTypes[i];
+            opp.ServiceProposal__c = '卸経由';
+            opportunities.add(opp);
+        }
         
-                
-        Opportunity__c testopp = new Opportunity__c();
-        testopp.Account__c = acc.Id;
-        testopp.QuotationType__c = '08：BGM専用見積（施設）';
-        testopp.ServiceProposal__c = '直販';
-        insert testopp;
-        // System.assertEquals(String.isNotEmpty(testopp.Account__c), true);
-        
-        Opportunity__c testopp2 = new Opportunity__c();
-        testopp2.Account__c = acc2.Id;
-        testopp2.QuotationType__c = '05b：一式見積タイプ（相見積）';
-        testopp2.ServiceProposal__c = '提案なし';
-        insert testopp2;
-        
-        Opportunity__c testopp3 = new Opportunity__c();
-        testopp3.Account__c = acc3.Id;
-        testopp3.QuotationType__c = '01：個別価格タイプ（卸）';
-        testopp3.ServiceProposal__c = '卸経由';
-        insert testopp3;
-        
+        insert opportunities;
+
+        // 商品レコードを作成
+        Product2__c prod = new Product2__c();
+        prod.Name = 'ServiceProduct';
+        prod.IsActive__c = true;
+        prod.CategoryName1__c = '保守';
+        insert prod;
+
+        // 商談商品(保守)を作成
+        for(Integer i = 0; i < opportunities.size(); i++) {
+            OpportunityLineItem__c opl = new OpportunityLineItem__c();
+            opl.Opportunity__c = opportunities[i].Id;
+            opl.Product__c = prod.Id;
+        }
+        insert opl;
     }
     
-    static testMethod void testMethod1() {
+    static testMethod void testMethodAll() {
 
-        Opportunity__c obj = new Opportunity__c();
-        obj = [SELECT Id FROM Opportunity__c WHERE Account__r.Name='株式会社Company'];
+        List<Opportunity__c> opps = [SELECT Id FROM Opportunity__c WHERE Account__r.Name='株式会社Company'];
         
-        // 1.コントローラを利用するvisualforceページをテスト実行時の画面として設定
-        PageReference pageRef = Page.Make_Quota_Preview; //ページ名にはVisualforceページのページ名を入れる
-        pageRef.getParameters().put('id', obj.Id);
-        Test.setCurrentPage(pageRef);
-
-        Test.startTest();
-                
-        // 3.標準コントローラを生成
-        // オブジェクトを渡してインスタンス化する
-        ApexPages.StandardController stdController = new ApexPages.StandardController (obj);
-        
-        // 4.コントローラ拡張を生成
-        // 標準コントローラを渡してインスタンス化する
-        SetQuotationType extController = new SetQuotationType(stdController);
-        
-        System.assertEquals(extController.qt1 == null, false);
-        
-        System.assertEquals(extController.qt2 == null, false);
-
-        System.assertEquals(extController.qt4 == null, false);
+        for(Opportunity__c opp : opps) {
+            PageReference pageRef = Page.Make_Quota_Preview;
+            pageRef.getParameters().put('id', opp.Id);
+            Test.setCurrentPage(pageRef);
             
-        extController.getQt3();
-        
-        Test.stopTest();
-        
-    }
-    
-    static testMethod void testMethod2() {
+            Test.startTest();
 
-        Opportunity__c obj = new Opportunity__c();
-        obj = [SELECT Id FROM Opportunity__c WHERE Account__r.Name='株式会社Company2'];
-        
-        // 1.コントローラを利用するvisualforceページをテスト実行時の画面として設定
-        PageReference pageRef = Page.Make_Quota_Preview; //ページ名にはVisualforceページのページ名を入れる
-        pageRef.getParameters().put('id', obj.Id);
-        Test.setCurrentPage(pageRef);
-
-        Test.startTest();
-                
-        // 3.標準コントローラを生成
-        // オブジェクトを渡してインスタンス化する
-        ApexPages.StandardController stdController = new ApexPages.StandardController (obj);
-        
-        // 4.コントローラ拡張を生成
-        // 標準コントローラを渡してインスタンス化する
-        SetQuotationType extController = new SetQuotationType(stdController);
-        
-        System.assertEquals(extController.qt1 == null, false);
-        
-        System.assertEquals(extController.qt2 == null, false);
-
-        System.assertEquals(extController.qt4 == null, false);
+            ApexPages.StandardController stdController = new ApexPages.StandardController(opp);
             
-        extController.getQt3();
-        
-        Test.stopTest();
-        
-    }
-    
-    static testMethod void testMethod3() {
-
-        Opportunity__c obj = new Opportunity__c();
-        obj = [SELECT Id FROM Opportunity__c WHERE Account__r.Name='株式会社Company3'];
-        
-        // 1.コントローラを利用するvisualforceページをテスト実行時の画面として設定
-        PageReference pageRef = Page.Make_Quota_Preview; //ページ名にはVisualforceページのページ名を入れる
-        pageRef.getParameters().put('id', obj.Id);
-        Test.setCurrentPage(pageRef);
-
-        Test.startTest();
-                
-        // 3.標準コントローラを生成
-        // オブジェクトを渡してインスタンス化する
-        ApexPages.StandardController stdController = new ApexPages.StandardController (obj);
-        
-        // 4.コントローラ拡張を生成
-        // 標準コントローラを渡してインスタンス化する
-        SetQuotationType extController = new SetQuotationType(stdController);
-        
-        System.assertEquals(extController.qt1 == null, false);
-        
-        System.assertEquals(extController.qt2 == null, false);
-
-        System.assertEquals(extController.qt4 == null, false);
+            SetQuotationType extController = new SetQuotationType(stdController);
             
-        extController.getQt3();
-        
-        Test.stopTest();
-        
+            System.assertEquals(extController.qt1 == null, false);
+            System.assertEquals(extController.qt2 == null, false);
+            System.assertEquals(extController.qt4 == null, false);
+            extController.getQt3();
+            
+            Test.stopTest();
+        }
     }
     
 }
