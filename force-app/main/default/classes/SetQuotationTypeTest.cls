@@ -62,7 +62,7 @@ public class SetQuotationTypeTest {
             OpportunityLineItem__c opl = new OpportunityLineItem__c();
             opl.Opportunity__c = opportunities[i].Id;
             opl.Product__c = prod.Id;
-            opl.RecordTypeId = '012BC000000W8nFYAS';
+            opl.RecordTypeId = '012fD000001ozkTQAQ';
             opls.add(opl);
         }
         insert opls;
